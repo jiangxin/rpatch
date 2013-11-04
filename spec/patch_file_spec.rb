@@ -7,7 +7,7 @@ require 'stringio'
 
 describe Rpatch::PatchFile do
     let(:diff) do
-      diff = <<-EOF
+      <<-EOF
 diff -ru before/readme.txt after/readme.txt
 --- a/readme.txt   2013-11-03 22:17:02.000000000 +0800
 +++ b/readme.txt    2013-11-03 21:10:46.000000000 +0800
@@ -219,8 +219,6 @@ diff -ru before/readme.txt after/readme.txt
   end
 
   it "patch failed (1): patch format error" do
-    before = ''
-
     diff = <<-EOF
 diff -ru before/readme.txt after/readme.txt
 --- a/readme.txt   2013-11-03 22:17:02.000000000 +0800
@@ -236,17 +234,9 @@ RE:-regexp match
 BAD PATCH SYNTAX.
     EOF
 
-    after = <<-EOF
-    EOF
-
-
-    inputfile = StringIO.new(before, "r")
     patchfile = StringIO.new(diff, "r")
-    output = ''
-    outputfile = StringIO.new(output, "w")
-
     expect {
-      patch = Rpatch::PatchFile.new(patchfile, 1)
+      Rpatch::PatchFile.new(patchfile, 1)
     }.to raise_exception Rpatch::PatchFormatError, /BAD PATCH SYNTAX./
 
   end
@@ -265,19 +255,14 @@ diff -ru before/readme.txt after/readme.txt
 +world
     EOF
 
-    after = <<-EOF
-    EOF
-
-
     inputfile = StringIO.new(before, "r")
     patchfile = StringIO.new(diff, "r")
     output = ''
     outputfile = StringIO.new(output, "w")
 
     patch = Rpatch::PatchFile.new(patchfile, 1)
-    patch.apply_to(inputfile, outputfile).should == false
-    output.should == before
+    patch.apply_to(inputfile, outputfile).should be == false
+    output.should be == before
   end
-
 
 end

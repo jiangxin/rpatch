@@ -7,7 +7,7 @@ require 'spec_helper'
 describe Rpatch::PatchHunk do
 
   let(:hunk_text) do
-    hunk_text = <<-EOF
+    <<-EOF
 +/*
 + * Copyright (c) 2013 Jiang Xin
 + */
@@ -36,30 +36,30 @@ describe Rpatch::PatchHunk do
 
   it "Initial with description only" do
     title = "foo.bar"
-    Rpatch::PatchHunk.new("@@ #{title}").title.should == title
+    Rpatch::PatchHunk.new("@@ #{title}").title.should be == title
   end
 
   it "Initial with zero patterns_before_patch.size and zero patterns_after_patch.size" do
-    Rpatch::PatchHunk.new("@@ test").diffs.size.should == 0
-    Rpatch::PatchHunk.new("@@ test").patterns_before_patch.size.should == 0
-    Rpatch::PatchHunk.new("@@ test").patterns_after_patch.size.should == 0
+    Rpatch::PatchHunk.new("@@ test").diffs.size.should be == 0
+    Rpatch::PatchHunk.new("@@ test").patterns_before_patch.size.should be == 0
+    Rpatch::PatchHunk.new("@@ test").patterns_after_patch.size.should be == 0
   end
 
 
   it "patch_hunk's desc and contents test" do
-    patch_hunk.title.should == 'description'
-    patch_hunk.diffs.size.should == hunk_text.split("\n").size
-    patch_hunk.patterns.size.should == 15
+    patch_hunk.title.should be == 'description'
+    patch_hunk.diffs.size.should be == hunk_text.split("\n").size
+    patch_hunk.patterns.size.should be == 15
   end
 
   it "should have 7 patterns_before_patch.sizes" do
-    patch_hunk.patterns_before_patch.size.should == 7
-    patch_hunk.patterns_before_patch.size.should == 7
+    patch_hunk.patterns_before_patch.size.should be == 7
+    patch_hunk.patterns_before_patch.size.should be == 7
   end
 
   it "should have 13 patterns_after_patch.sizes" do
-    patch_hunk.patterns_after_patch.size.should == 13
-    patch_hunk.patterns_after_patch.size.should == 13
+    patch_hunk.patterns_after_patch.size.should be == 13
+    patch_hunk.patterns_after_patch.size.should be == 13
   end
 
   it "patch success (1)" do
@@ -91,12 +91,12 @@ Happy hacking.
 jiangxin
     EOF
 
-    patch_hunk.match_after_patch(before_lines).should == nil
-    patch_hunk.match_before_patch(before_lines).should == [0, 7]
+    patch_hunk.match_after_patch(before_lines).should be == nil
+    patch_hunk.match_before_patch(before_lines).should be == [0, 7]
     result = before_lines.dup
-    patch_hunk.patch(result).should == after.split("\n")
-    (result * "\n" + "\n").should == after
-    before_lines_dup.should == before_lines
+    patch_hunk.patch(result).should be == after.split("\n")
+    (result * "\n" + "\n").should be == after
+    before_lines_dup.should be == before_lines
   end
 
   it "patch success (2): whitespaces" do
@@ -128,12 +128,12 @@ Happy                  hacking.
 jiangxin
     EOF
 
-    patch_hunk.match_after_patch(before_lines).should == nil
-    patch_hunk.match_before_patch(before_lines).should == [0, 7]
+    patch_hunk.match_after_patch(before_lines).should be == nil
+    patch_hunk.match_before_patch(before_lines).should be == [0, 7]
     result = before_lines.dup
     patch_hunk.patch(result)
-    (result * "\n" + "\n").should == after
-    before_lines_dup.should == before_lines
+    (result * "\n" + "\n").should be == after
+    before_lines_dup.should be == before_lines
   end
 
   it "patch success (3): blank lines and comments " do
@@ -173,12 +173,12 @@ Happy                  hacking.
 jiangxin
     EOF
 
-    patch_hunk.match_after_patch(before_lines).should == nil
-    patch_hunk.match_before_patch(before_lines).should == [2, 9]
+    patch_hunk.match_after_patch(before_lines).should be == nil
+    patch_hunk.match_before_patch(before_lines).should be == [2, 9]
     result = before_lines.dup
     patch_hunk.patch(result)
-    (result * "\n" + "\n").should == after
-    before_lines_dup.should == before_lines
+    (result * "\n" + "\n").should be == after
+    before_lines_dup.should be == before_lines
   end
 
   it "patch failed (1): not match" do
@@ -186,12 +186,12 @@ jiangxin
     before_lines = before.split("\n")
     before_lines_dup = before_lines.dup
 
-    patch_hunk.match_after_patch(before_lines).should == nil
-    patch_hunk.match_before_patch(before_lines).should == nil
+    patch_hunk.match_after_patch(before_lines).should be == nil
+    patch_hunk.match_before_patch(before_lines).should be == nil
     expect {
       patch_hunk.patch(before_lines)
     }.to raise_exception Rpatch::PatchHunkError, /Hunk # \(description\) FAILED to apply. Match failed./
-    before_lines.should == before_lines_dup
+    before_lines.should be == before_lines_dup
   end
 
   it "patch failed (2): already patched" do
@@ -219,12 +219,12 @@ jiangxin
     before_lines = before.split("\n")
     before_lines_dup = before_lines.dup
 
-    patch_hunk.match_after_patch(before_lines).should == [0, 17]
-    patch_hunk.match_before_patch(before_lines).should == nil
+    patch_hunk.match_after_patch(before_lines).should be == [0, 17]
+    patch_hunk.match_before_patch(before_lines).should be == nil
     expect {
       patch_hunk.patch(before_lines)
     }.to raise_exception Rpatch::AlreadyPatchedError
-    before_lines.should == before_lines_dup
+    before_lines.should be == before_lines_dup
   end
 
   it "patch partial of text" do
@@ -236,7 +236,7 @@ So comes rpatch.
 Happy hacking.
     EOF
     before_lines = before.split("\n")
-    before_lines_dup = before_lines.dup
+    result = before_lines.dup
 
     diff = <<-EOF
 +/*
@@ -264,10 +264,10 @@ Happy hacking.
       patch_hunk.feed_line line.chomp
     end
 
-    patch_hunk.match_after_patch(before_lines).should == nil
-    patch_hunk.match_before_patch(before_lines).should == [0, 2]
-    result = before_lines.dup
+    patch_hunk.match_after_patch(before_lines).should be == nil
+    patch_hunk.match_before_patch(before_lines).should be == [0, 2]
+    result.should be == before_lines
     patch_hunk.patch(result)
-    (result * "\n" + "\n").should == after
+    (result * "\n" + "\n").should be == after
   end
 end

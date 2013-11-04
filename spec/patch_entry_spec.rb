@@ -10,27 +10,27 @@ describe Rpatch::PatchEntry do
     old = "a/foo/bar/src/file.c"
     new = "b/foo/bar/src/file.c"
     entry = Rpatch::PatchEntry.new(old, new, 0)
-    entry.oldfile.should == "a/foo/bar/src/file.c"
-    entry.newfile.should == "b/foo/bar/src/file.c"
+    entry.oldfile.should be == "a/foo/bar/src/file.c"
+    entry.newfile.should be == "b/foo/bar/src/file.c"
     entry = Rpatch::PatchEntry.new(old, new, 1)
-    entry.oldfile.should == "foo/bar/src/file.c"
-    entry.newfile.should == "foo/bar/src/file.c"
+    entry.oldfile.should be == "foo/bar/src/file.c"
+    entry.newfile.should be == "foo/bar/src/file.c"
     entry = Rpatch::PatchEntry.new(old, new, 3)
-    entry.oldfile.should == "src/file.c"
-    entry.newfile.should == "src/file.c"
+    entry.oldfile.should be == "src/file.c"
+    entry.newfile.should be == "src/file.c"
   end
 
   it "filename and patch level (2)" do
     old = "/dev/null"
     new = "b/foo/bar/src/file.c"
     entry = Rpatch::PatchEntry.new(old, new, 1)
-    entry.oldfile.should == "/dev/null"
-    entry.newfile.should == "foo/bar/src/file.c"
+    entry.oldfile.should eq "/dev/null"
+    entry.newfile.should eq "foo/bar/src/file.c"
     old = "a/foo/bar/src/file.c"
     new = "/dev/null"
     entry = Rpatch::PatchEntry.new(old, new, 1)
-    entry.oldfile.should == "foo/bar/src/file.c"
-    entry.newfile.should == "/dev/null"
+    entry.oldfile.should eq "foo/bar/src/file.c"
+    entry.newfile.should eq "/dev/null"
   end
 
   it "patch on file (1)" do

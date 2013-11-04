@@ -1,2 +1,5 @@
+--default_path spec
+--order rand
 --color
 --format doc
+--warnings

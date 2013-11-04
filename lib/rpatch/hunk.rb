@@ -35,7 +35,6 @@ module Rpatch
         end
       end
 
-      changed = true
       n, size = matched_before
       lines[n...(n+size)] = convert lines[n...(n+size)]
       lines

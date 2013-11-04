@@ -7,7 +7,7 @@ require 'stringio'
 
 describe Rpatch::PatchFile do
     let(:diff) do
-      diff = <<-EOF
+      <<-EOF
 diff -ru before/readme.txt after/readme.txt
 --- a/readme.txt   2013-11-03 22:17:02.000000000 +0800
 +++ b/readme.txt    2013-11-03 21:10:46.000000000 +0800

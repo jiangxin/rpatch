@@ -83,7 +83,7 @@ module Rpatch
                 level = $2
               end
               unless filename.start_with? '#'
-                apply_one(path, filename, level) || patch_status = false
+                apply_one(path, File.join(quilt_dir, filename), level) || patch_status = false
               end
             end
           end
@@ -132,22 +132,27 @@ module Rpatch
     end
 
     def find_new_entry(lines)
-      return nil if lines[0] =~ /^(@@| |-|\+|RE: |RE:-)/
       old = new = nil
-      lines_dup = lines.dup
-      line = lines_dup.shift
-      line = lines_dup.shift if line =~ /^diff /
-      line = lines_dup.shift if line =~ /^new file mode/
-      line = lines_dup.shift if line =~ /^index /
-      if line =~ /^--- (.+?)([\s]+[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}.*)?$/
-        old = $1
-        line = lines_dup.shift
+      lines = lines.dup
+      while lines.first
+        case lines.first
+        when /^--- (.+?)([\s]+[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}.*)?$/
+          old = $1
+        when /^\+\+\+ (.+?)([\s]+[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}.*)?$/
+          new = $1
+        when /^(@@| |-|\+|RE: |RE:-)/
+          break
+        when /^(diff |new file mode|index )/
+            # Ignore GNU/Git diff header
+        when /^(Index:|=+)/
+            # Ignore quilt patch header
+        else
+            # Ignore comments in the header
+        end
+        lines.shift
       end
-      if line =~ /^\+\+\+ (.+?)([\s]+[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}.*)?$/
-        new = $1
-        line = lines_dup.shift
-      end
-      if line =~ /^@@ / and old and new
+
+      if lines.first =~ /^@@ / and old and new
         [old, new]
       else
         nil

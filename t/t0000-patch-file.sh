@@ -55,7 +55,6 @@ baz
 EOF
 
 cat > diff <<EOF
-diff -u a/foo b/foo
 --- a/foo       2013-11-04 16:01:56.000000000 +0800
 +++ b/foo       2013-11-04 16:01:59.000000000 +0800
 @@ insert heading

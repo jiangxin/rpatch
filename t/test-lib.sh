@@ -33,11 +33,10 @@ then
 	# elsewhere
 	TEST_OUTPUT_DIRECTORY=$TEST_DIRECTORY
 fi
-APP_BIN_DIR="$TEST_DIRECTORY"/..
 
 ################################################################
 # It appears that people try to run tests without building...
-"$APP_BIN_DIR/rpatch" -h >/dev/null
+"rpatch" -h >/dev/null
 if test $? != 0
 then
 	echo >&2 'error: can not find rpatch for test.'
@@ -476,9 +475,9 @@ test_done () {
 # calls.
 if test -n "$GIT_TEST_INSTALLED"
 then
-	PATH=$GIT_TEST_INSTALLED:$APP_BIN_DIR:$PATH
+	PATH=$GIT_TEST_INSTALLED:$PATH
 else
-	PATH="$APP_BIN_DIR:$PATH"
+	PATH="$PATH"
 fi
 export PATH
 

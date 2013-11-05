@@ -1,8 +1,9 @@
 #!/usr/bin/env ruby
 #
 
-require_relative 'error'
 require 'stringio'
+require 'rpatch/error'
+require 'rpatch/hunk'
 
 module Rpatch
   class PatchEntry

@@ -1,11 +1,10 @@
 #!/usr/bin/env ruby
 #
 
-require 'rubygems'
 require 'spec_helper'
 require 'stringio'
 
-describe Rpatch::PatchFile do
+describe Rpatch::Patch do
     let(:diff) do
       <<-EOF
 diff -ru before/readme.txt after/readme.txt
@@ -66,7 +65,7 @@ jiangxin
     patchfile = StringIO.new(diff, "r")
     output = ''
     outputfile = StringIO.new(output, "w")
-    patch = Rpatch::PatchFile.new(patchfile, 1)
+    patch = Rpatch::Patch.new(patchfile, 1)
     patch.apply_to(inputfile, outputfile)
     output.should == after
   end

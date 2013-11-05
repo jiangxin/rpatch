@@ -1,11 +1,10 @@
 #!/usr/bin/env ruby
 #
 
-require 'rubygems'
 require 'spec_helper'
 require 'stringio'
 
-describe Rpatch::PatchFile do
+describe Rpatch::Patch do
     let(:diff) do
       <<-EOF
 diff -ru before/readme.txt after/readme.txt
@@ -59,7 +58,7 @@ jiangxin
     patchfile = StringIO.new(diff, "r")
     output = ''
     outputfile = StringIO.new(output, "w")
-    patch = Rpatch::PatchFile.new(patchfile, 1)
+    patch = Rpatch::Patch.new(patchfile, 1)
     patch.apply_to(inputfile, outputfile)
     output.should == after
   end
@@ -95,7 +94,7 @@ jiangxin
     patchfile = StringIO.new(diff, "r")
     output = ''
     outputfile = StringIO.new(output, "w")
-    patch = Rpatch::PatchFile.new(patchfile, 1)
+    patch = Rpatch::Patch.new(patchfile, 1)
     patch.apply_to(inputfile, outputfile)
     output.should == after
   end
@@ -123,7 +122,7 @@ jiangxin
     patchfile = StringIO.new(diff, "r")
     output = ''
     outputfile = StringIO.new(output, "w")
-    patch = Rpatch::PatchFile.new(patchfile, 1)
+    patch = Rpatch::Patch.new(patchfile, 1)
     patch.apply_to(inputfile, outputfile)
     output.should == after
   end
@@ -163,7 +162,7 @@ jiangxin
     patchfile = StringIO.new(diff, "r")
     output = ''
     outputfile = StringIO.new(output, "w")
-    patch = Rpatch::PatchFile.new(patchfile, 1)
+    patch = Rpatch::Patch.new(patchfile, 1)
     patch.apply_to(inputfile, outputfile)
     output.should == after
   end
@@ -190,7 +189,7 @@ world
     patchfile = StringIO.new(diff, "r")
     output = ''
     outputfile = StringIO.new(output, "w")
-    patch = Rpatch::PatchFile.new(patchfile, 1)
+    patch = Rpatch::Patch.new(patchfile, 1)
     patch.apply_to(inputfile, outputfile)
     output.should == after
   end
@@ -213,7 +212,7 @@ diff -ru before/readme.txt after/readme.txt
     patchfile = StringIO.new(diff, "r")
     output = ''
     outputfile = StringIO.new(output, "w")
-    patch = Rpatch::PatchFile.new(patchfile, 1)
+    patch = Rpatch::Patch.new(patchfile, 1)
     patch.apply_to(inputfile, outputfile)
     output.should == after
   end
@@ -236,7 +235,7 @@ BAD PATCH SYNTAX.
 
     patchfile = StringIO.new(diff, "r")
     expect {
-      Rpatch::PatchFile.new(patchfile, 1)
+      Rpatch::Patch.new(patchfile, 1)
     }.to raise_exception Rpatch::PatchFormatError, /BAD PATCH SYNTAX./
 
   end
@@ -260,7 +259,7 @@ diff -ru before/readme.txt after/readme.txt
     output = ''
     outputfile = StringIO.new(output, "w")
 
-    patch = Rpatch::PatchFile.new(patchfile, 1)
+    patch = Rpatch::Patch.new(patchfile, 1)
     patch.apply_to(inputfile, outputfile).should be == false
     output.should be == before
   end

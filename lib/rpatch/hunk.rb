@@ -1,4 +1,4 @@
-require_relative 'error'
+require 'rpatch/error'
 
 module Rpatch
   class PatchHunk

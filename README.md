@@ -1,3 +1,5 @@
+# Rpatch
+
 rpatch: a patch utility support regexp in patchfile.
 
 Rpatch is a patch utility, more tolerant than GNU patch. It will ignore
@@ -53,3 +55,36 @@ For example:
         Happy hacking.
         --
         jiangxin
+
+## Installation
+
+Install using rubygems:
+
+    $ gem install rpatch
+
+Or install from source:
+
+    $ rake build
+    $ rake install
+
+## Usage
+
+Rpatch is a GNU patch likely utilty, patch original file using patch file like this:
+
+    $ patch originalfile patchfile
+
+Or patch files under the current directory, and read patchfile from STDIN:
+
+    $ patch -p1 < patchfile
+
+Rpatch can also read a series patches in quilt format.
+
+    $ patch -p1 . patches
+
+## Contributing
+
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create new Pull Request

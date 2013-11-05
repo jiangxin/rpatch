@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 #
 
-require 'rubygems'
 require 'spec_helper'
 
 describe Rpatch::PatchEntry do

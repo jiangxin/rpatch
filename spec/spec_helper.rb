@@ -16,24 +16,9 @@ RSpec.configure do |config|
   config.order = 'random'
 end
 
-def message_pipe(message, &block)
-  pr, pw = IO.pipe, IO.pipe
-
-  result = nil
-  if fork
-    pr.last.close
-    pw.first.close
-    if block_given?
-      block.call(pr.first, pw.last)
-    end
-  else
-    pr.first.close
-    pw.last.close
-    pr.last.puts(message)
-    pr.last.close
-    result = pw.first.read
-  end
-end
-
 $:.unshift 'lib'
-require 'rpatch'
+require 'rpatch/patch'
+require 'rpatch/entry'
+require 'rpatch/hunk'
+require 'rpatch/error'
+require 'rpatch/version'

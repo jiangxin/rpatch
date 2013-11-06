@@ -2,6 +2,7 @@
 #
 
 require 'stringio'
+require 'fileutils'
 require 'rpatch/error'
 require 'rpatch/hunk'
 
@@ -59,6 +60,9 @@ module Rpatch
       	filename = "<#{newfile}>"
       else
       	filename = output
+        unless File.exist?(File.dirname(output))
+          FileUtils.mkdir_p File.dirname(output)
+        end
       end
 
       if input.is_a? IO or input.is_a? StringIO
@@ -115,12 +119,13 @@ module Rpatch
     end
 
     def patch_on_directory(inputdir, outputdir=nil)
-      outputdir ||=inputdir
-      input = oldfile.start_with?('/') ? oldfile : File.join(inputdir, oldfile)
-      output = outputdir
-      if File.directory? outputdir
-        output = newfile.start_with?('/') ? newfile : File.join(outputdir, newfile)
+      outputdir ||= inputdir
+      if oldfile == '/dev/null'
+        input = newfile.start_with?('/') ? newfile : File.join(inputdir, newfile)
+      else
+        input = oldfile.start_with?('/') ? oldfile : File.join(inputdir, oldfile)
       end
+      output = newfile.start_with?('/') ? newfile : File.join(outputdir, newfile)
       patch_on_file(input, output)
     end
 

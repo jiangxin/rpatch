@@ -6,6 +6,9 @@ require 'rpatch/utils'
 require 'rpatch/entry'
 
 module Rpatch
+
+  REGEXP_VALID_HUNK_PREFIX = /^(@@| |-|\+|RE: |RE:-|<$|>$)/
+
   class Patch
     attr_reader :name, :level, :patch_entries
 
@@ -102,14 +105,14 @@ module Rpatch
         entry_names = find_new_entry(lines[i..i+6])
         if entry_names
           @patch_entries << PatchEntry.new(entry_names[0], entry_names[1], @level)
-          while not lines[i] =~ /^@@ / and lines[i]
+          while not lines[i] =~ /^@@/ and lines[i]
             i += 1
           end
           break unless i < lines.size
         end
 
         if @patch_entries.any?
-          if lines[i] =~ /^(@@| |-|\+|RE: |RE:-)/
+          if lines[i] =~ REGEXP_VALID_HUNK_PREFIX
             @patch_entries.last.feed_line lines[i]
           elsif lines[i] =~ /^(Binary files |Only in)/
             # ignore
@@ -141,7 +144,7 @@ module Rpatch
           old = $1
         when /^\+\+\+ (.+?)([\s]+[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}.*)?$/
           new = $1
-        when /^(@@| |-|\+|RE: |RE:-)/
+        when REGEXP_VALID_HUNK_PREFIX
           break
         when /^(diff |new file mode|index )/
             # Ignore GNU/Git diff header
@@ -153,7 +156,7 @@ module Rpatch
         lines.shift
       end
 
-      if lines.first =~ /^@@ / and old and new
+      if lines.first =~ /^@@/ and old and new
         [old, new]
       else
         nil

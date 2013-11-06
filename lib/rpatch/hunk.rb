@@ -11,7 +11,15 @@ module Rpatch
     end
 
     def feed_line(line)
-      diffs << line.chomp
+      @diffs << line.chomp
+    end
+
+    def head?
+      not tail?
+    end
+
+    def tail?
+      @diffs.first == ">"
     end
 
     # Patch lines in place.
@@ -43,41 +51,45 @@ module Rpatch
     # Apply patch on lines.
     # Return array of strings contain result of applying patch.
     def convert(lines)
-      lines_dup = lines.dup
+      lines = lines.dup
       result = []
-      i = 0
+      i = j = 0
       while i < @diffs.size
         case @diffs[i]
         when /^( |RE: )/
           while true
-            match =  match_line lines_dup.first, patterns[i]
+            match =  match_line lines.first, patterns[j]
             if not match
-              raise PatchFormatError.new("Hunk #{num} (#{title}) FAILED to apply. No match \"#{patterns[i]}\" with #{lines_dup.first.inspect}.")
+              raise PatchFormatError.new("Hunk #{num} (#{title}) FAILED to apply. No match \"#{patterns[j]}\" with #{lines.first.inspect}.")
             elsif match > 0
-              result << lines_dup.shift
+              result << lines.shift
               break
             elsif match == 0
-              result << lines_dup.shift
+              result << lines.shift
             end
           end
         when /^(-|RE:-)/
           while true
-            match =  match_line lines_dup.first, patterns[i]
+            match =  match_line lines.first, patterns[j]
             if not match
-              raise PatchFormatError.new("Hunk #{num} (#{title}) FAILED to apply. No match pattern \"#{patterns[i]}\" against #{lines_dup.first.inspect}.")
+              raise PatchFormatError.new("Hunk #{num} (#{title}) FAILED to apply. No match pattern \"#{patterns[j]}\" against #{lines.first.inspect}.")
             elsif match > 0
-              lines_dup.shift
+              lines.shift
               break
             elsif match == 0
-              lines_dup.shift
+              lines.shift
             end
           end
         when /^\+/
           result << @diffs[i][1..-1]
+        when /^(<|>)$/
+          # patterns do not have locaiton direction
+          j -= 1
         else
           raise PatchFormatError.new("Hunk #{num} (#{title}) FAILED to apply. Unknow syntax in hunk: #{@diffs[i]}")
         end
         i += 1
+        j += 1
       end
       result
     end
@@ -86,19 +98,30 @@ module Rpatch
     # match start with location and +num lines are matched.
     # Return nil, if nothing matched.
     def match_after_patch(lines)
-      i = 0
       if patterns_after_patch.size == 0
-        return [0, 0]
+        return head? ? [0, 0] : [lines.size, 0]
       end
 
-      loop_n = lines.size
-      loop_n = loop_n - patterns_after_patch.size + 1 if patterns_after_patch.size > 0
-      while i < loop_n
-        matched_line_no = match_beginning(lines[i..-1], patterns_after_patch)
-        if matched_line_no
-          return [i, matched_line_no]
-        else
-          i += 1
+      if head?
+        i = 0
+        loop_n = lines.size - patterns_after_patch.size
+        while i <= loop_n
+          matched_size = get_matched_size(lines[i..-1], patterns_after_patch)
+          if matched_size
+            return [i, matched_size]
+          else
+            i += 1
+          end
+        end
+      else
+        i = lines.size - patterns_after_patch.size
+        while i >= 0
+          matched_size = get_matched_size(lines[i..-1], patterns_after_patch)
+          if matched_size
+            return [i, matched_size]
+          else
+            i -= 1
+          end
         end
       end
       nil
@@ -108,20 +131,31 @@ module Rpatch
     # at location, and +num lines would be replaced.
     # Return nil, if nothing matched.
     def match_before_patch(lines)
-      i = 0
       if patterns_before_patch.size == 0
-        return [0, 0]
+        return head? ? [0, 0] : [lines.size, 0]
       end
 
-      loop_n = lines.size
-      loop_n = loop_n - patterns_before_patch.size + 1 if patterns_before_patch.size > 0
+      if head?
+        i = 0
+        loop_n = lines.size - patterns_before_patch.size
 
-      while i < loop_n
-        matched_size = match_beginning(lines[i..-1], patterns_before_patch)
-        if matched_size
-          return [i, matched_size]
-        else
-          i += 1
+        while i <= loop_n
+          matched_size = get_matched_size(lines[i..-1], patterns_before_patch)
+          if matched_size
+            return [i, matched_size]
+          else
+            i += 1
+          end
+        end
+      else
+        i = lines.size - patterns_before_patch.size
+        while i >= 0
+          matched_size = get_matched_size(lines[i..-1], patterns_before_patch)
+          if matched_size
+            return [i, matched_size]
+          else
+            i -= 1
+          end
         end
       end
       nil
@@ -130,7 +164,7 @@ module Rpatch
     # Test whether patterns match against the beginning of lines
     # Return nil if not match, or return number of lines matched
     # with patterns (would be replaced later).
-    def match_beginning(lines, patterns)
+    def get_matched_size(lines, patterns)
       i = 0
       found = true
       patterns.each do |pattern|
@@ -223,6 +257,8 @@ module Rpatch
             result << Regexp.new(line[4..-1].strip)
           when /^\+/
             next
+          when /^(<|>)$/
+            # ignore locaiton direction
           else
             raise PatchFormatError.new("Unknown pattern in diffs: #{line}")
           end
@@ -242,6 +278,8 @@ module Rpatch
             result << Regexp.new(line[4..-1].strip)
           when /^(-|RE:-)/
             next
+          when /^(<|>)$/
+            # ignore locaiton direction
           else
             raise PatchFormatError.new("Unknown pattern in diffs: #{line}")
           end
@@ -259,6 +297,8 @@ module Rpatch
             result << line[1..-1].strip.gsub(/\s+/, ' ')
           when /^(RE: |RE:-)/
             result << Regexp.new(line[4..-1].strip)
+          when /^(<|>)$/
+            # ignore locaiton direction
           else
             raise PatchFormatError.new("Unknown pattern in diffs: #{line}")
           end

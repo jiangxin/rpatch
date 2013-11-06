@@ -4,12 +4,21 @@ rpatch: a patch utility support regexp in patchfile.
 
 Rpatch is a patch utility, more tolerant than GNU patch. It will ignore
 changes of blank lines and white spaces, and what's more you can write
-regexp ("RE: " and "RE:-") in patch file to match lines.
+regexp ("/ " and "/-") in patch file to match lines.
 
- * Use "RE: " with a regexp to match unchanged line.
- * Use "RE:-" with a regexp to match removed line.
- * Use "@@" to starts a new patch hunk only and use it's text as
-   description for the hunk only.
+Three typical diff formats:
+
+ * Start with " ": exist in both original and target. (context)
+ * Start with "-": only in original file, not in target. (removed)
+ * Start with "+": not in original file, but in target. (added)
+
+Additional diff formats that rpatch support:
+
+ * Start with "/ ": regexp which match both original and target.
+ * Start with "/-": regexp which match only original file.
+ * Start with "? ": in original file, but may not in target.
+ * Start with "?+": not in original file, but may or may not in target.
+ * Start with "?/ ": regexp which match original, but may not have in target.
 
 For example:
 
@@ -31,8 +40,8 @@ For example:
         +# Copyright (c) 2013 Jiang Xin
         +
          When I hack files using GNU patch,
-        RE: sometimes fail because .*
-        RE:-(blah\s*){3}
+        / [sS]ometimes fail because .*
+        /-(blah\s*){3}
         @@ add notes
         +If patch can ignore blank lines, support regex patterns
         +in patch, it will be nice.

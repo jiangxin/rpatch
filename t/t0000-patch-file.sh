@@ -34,15 +34,15 @@ test_expect_success 'patch newfile' '
 
 cat > expect_errlog <<EOF
 Patched "actual".
-actual: Hunk 1 (add two lines) is already patched.
+INFO: actual: Hunk 1 (add two lines) is already patched.
 actual: nothing changed
 EOF
 
 test_expect_success 'patch newfile (2nd)' '
 	rm actual &&
 	touch actual &&
-	rpatch actual < diff 2> actual_errlog &&
-	rpatch actual < diff 2>>actual_errlog &&
+	rpatch -vv actual < diff 2> actual_errlog &&
+	rpatch -vv actual < diff 2>>actual_errlog &&
 	test_cmp expect actual &&
 	test_cmp expect_errlog actual_errlog
 '
@@ -84,14 +84,14 @@ test_expect_success 'patch add/remote contents' '
 ############################################################
 
 cat > expect_errlog <<EOF
-actual: Hunk 1 (insert heading) is already patched.
-actual: Hunk 2 (add/remove) is already patched.
-actual: Hunk 3 (insert footer) is already patched.
+INFO: actual: Hunk 1 (insert heading) is already patched.
+INFO: actual: Hunk 2 (add/remove) is already patched.
+INFO: actual: Hunk 3 (insert footer) is already patched.
 actual: nothing changed
 EOF
 
 test_expect_success 'patch add/remote contents (2nd)' '
-	rpatch actual < diff 2>actual_errlog &&
+	rpatch -vv actual < diff 2>actual_errlog &&
 	test_cmp expect actual &&
 	test_cmp expect_errlog actual_errlog
 '
@@ -114,7 +114,7 @@ Remove "actual".
 EOF
 
 test_expect_success 'patch to rm file' '
-	rpatch -p1 actual < diff 2> actual_errlog &&
+	rpatch -vv -p1 actual < diff 2> actual_errlog &&
 	test ! -f actual &&
 	test_cmp expect_errlog actual_errlog
 '
@@ -122,13 +122,13 @@ test_expect_success 'patch to rm file' '
 ############################################################
 
 cat > expect_errlog <<EOF
-actual: Hunk 1 (delete all) is already patched.
+INFO: actual: Hunk 1 (delete all) is already patched.
 actual: nothing changed
 EOF
 
 test_expect_success 'patch to rm file (2nd)' '
 	touch actual &&
-	rpatch -p1 actual < diff 2> actual_errlog &&
+	rpatch -vv -p1 actual < diff 2> actual_errlog &&
 	test -z "$(cat actual)" &&
 	test_cmp expect_errlog actual_errlog
 '
@@ -167,7 +167,7 @@ EOF
 
 test_expect_success 'use regexp in patch' '
 	cp orig actual &&
-	rpatch actual < diff 2> actual_errlog &&
+	rpatch -vv actual < diff 2> actual_errlog &&
 	test_cmp expect actual &&
 	test_cmp expect_errlog actual_errlog
 '
@@ -175,13 +175,13 @@ test_expect_success 'use regexp in patch' '
 ############################################################
 
 cat > expect_errlog <<EOF
-actual: Hunk 1 (remove bAr) is already patched.
-actual: Hunk 2 (mixed) is already patched.
+INFO: actual: Hunk 1 (remove bAr) is already patched.
+INFO: actual: Hunk 2 (mixed) is already patched.
 actual: nothing changed
 EOF
 
 test_expect_success 'use regexp in patch (2nd)' '
-	rpatch actual < diff 2> actual_errlog &&
+	rpatch -vv actual < diff 2> actual_errlog &&
 	test_cmp expect actual &&
 	test_cmp expect_errlog actual_errlog
 '
@@ -199,14 +199,14 @@ trash text
 EOF
 
 cat > expect_errlog <<EOF
-Error: Line 6 of patch "<IO>" is invalid.
-	=> "trash text"
+ERROR: Line 6 of patch "<IO>" is invalid.
+       => "trash text"
 EOF
 
 test_expect_success 'patch load fail: bad syntax' '
 	rm actual &&
 	touch actual &&
-	test_must_fail rpatch actual < diff 2> actual_errlog &&
+	test_must_fail rpatch -vv actual < diff 2> actual_errlog &&
 	test_cmp expect_errlog actual_errlog
 '
 
@@ -232,7 +232,7 @@ EOF
 
 test_expect_success 'patch apply fail' '
 	cp orig actual &&
-	test_must_fail rpatch actual < diff 2> actual_errlog &&
+	test_must_fail rpatch -vv actual < diff 2> actual_errlog &&
 	test_cmp expect_errlog actual_errlog
 '
 
@@ -261,14 +261,14 @@ EOF
 
 cat > expect_errlog <<EOF
 ERROR: actual: Hunk 2 (add footer) FAILED to apply. Match failed.
-Warning: saved orignal file as "actual.orig".
+WARNING: saved orignal file as "actual.orig".
 Patched "actual".
 EOF
 
 test_expect_success 'partial patch success' '
 	cp orig actual &&
 	test ! -f actual.orig &&
-	test_must_fail rpatch actual < diff 2> actual_errlog &&
+	test_must_fail rpatch -vv actual < diff 2> actual_errlog &&
 	test -f actual.orig &&
 	test_cmp actual.orig orig &&
 	test_cmp actual expect &&
@@ -278,13 +278,13 @@ test_expect_success 'partial patch success' '
 ############################################################
 
 cat > expect_errlog <<EOF
-actual: Hunk 1 (add header) is already patched.
+INFO: actual: Hunk 1 (add header) is already patched.
 ERROR: actual: Hunk 2 (add footer) FAILED to apply. Match failed.
 actual: nothing changed
 EOF
 
 test_expect_success 'partial patch success (2nd)' '
-	test_must_fail rpatch actual < diff 2> actual_errlog &&
+	test_must_fail rpatch -vv actual < diff 2> actual_errlog &&
 	test -f actual.orig &&
 	test_cmp actual.orig orig &&
 	test_cmp actual expect &&

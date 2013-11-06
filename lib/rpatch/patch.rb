@@ -2,6 +2,7 @@
 #
 
 require 'rpatch/error'
+require 'rpatch/utils'
 require 'rpatch/entry'
 
 module Rpatch
@@ -27,7 +28,7 @@ module Rpatch
         end
         patch_status
       rescue Exception => e
-        STDERR.puts "Error: #{e.message}"
+        Tty.error e.message
         patch_status = false
       end
     end
@@ -55,7 +56,7 @@ module Rpatch
             patch_entry.patch_on_file(input, output) || patch_status = false
           end
         rescue Exception => e
-          STDERR.puts "Error: #{e.message}"
+          Tty.error e.message
           patch_status = false
         end
       end
@@ -113,7 +114,7 @@ module Rpatch
           elsif lines[i] =~ /^(Binary files |Only in)/
             # ignore
           else
-            raise PatchFormatError, "Line #{i} of patch \"#{name}\" is invalid.\n\t=> #{lines[i].inspect}"
+            raise PatchFormatError, "Line #{i} of patch \"#{name}\" is invalid.\n=> #{lines[i].inspect}"
           end
         end
 

@@ -1,6 +1,7 @@
 require 'optparse'
-require 'rpatch/patch'
+require 'rpatch/utils'
 require 'rpatch/version'
+require 'rpatch/patch'
 
 module Rpatch
   class Runner
@@ -13,10 +14,12 @@ module Rpatch
           OptionParser.new do |opts|
             opts.banner = "Usage: rpatch [options] [originalfile [patchfile]]"
             opts.on("-p", "--strip num", "Patch level") {|v| patch_level = v.to_i}
-            opts.on("-v", "--version", "Show version") do
+            opts.on("-V", "--version", "Show version") do
               puts "Version #{Rpatch::VERSION}"
               exit 0
             end
+            opts.on("-v", "--verbose", "More verbose") {Tty.options[:verbose] += 1}
+            opts.on("-q", "--quiet", "Less verbose") {Tty.options[:verbose] -= 1}
             opts.on_tail("-h", "--help", "Show this message") do
               puts opts
               exit 0

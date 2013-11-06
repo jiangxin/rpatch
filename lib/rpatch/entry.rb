@@ -4,6 +4,7 @@
 require 'stringio'
 require 'fileutils'
 require 'rpatch/error'
+require 'rpatch/utils'
 require 'rpatch/hunk'
 
 module Rpatch
@@ -50,7 +51,7 @@ module Rpatch
         ''
       end
     rescue Exception => e
-      STDERR.puts "Error: #{e.message}"
+      Tty.error e.message
     end
 
     def patch_on_file(input, output=nil)
@@ -80,9 +81,9 @@ module Rpatch
         begin
           hunk.patch(lines)
         rescue AlreadyPatchedError => e
-          STDERR.puts "#{filename}: #{e.message}"
+          Tty.info "#{filename}: #{e.message}"
         rescue Exception => e
-          STDERR.puts "ERROR: #{filename}: #{e.message}"
+          Tty.error "#{filename}: #{e.message}"
           patch_status = false
         else
           patch_applied = true
@@ -92,7 +93,7 @@ module Rpatch
       if output.is_a? IO or output.is_a? StringIO
         output.write lines * "\n" + "\n"
       elsif not patch_applied
-        STDERR.puts "#{filename}: nothing changed"
+        Tty.notice "#{filename}: nothing changed"
         if input != output
           File.open(output, "w") do |io|
             io.write lines * "\n" + "\n"
@@ -100,19 +101,19 @@ module Rpatch
         end
       else
         unless patch_status
-          STDERR.puts "Warning: saved orignal file as \"#{output}.orig\"."
+          Tty.warning "saved orignal file as \"#{output}.orig\"."
           File.open("#{output}.orig", "w") do |io|
             io.write lines_dup * "\n" + "\n"
           end
         end
         if lines.size > 0
-          STDERR.puts "Patched \"#{output}\"."
           File.open(output, "w") do |io|
             io.write lines * "\n" + "\n"
           end
+          Tty.notice "Patched \"#{output}\"."
         else
-          STDERR.puts "Remove \"#{output}\"."
           File.unlink output
+          Tty.notice "Remove \"#{output}\"."
         end
       end
       return patch_status

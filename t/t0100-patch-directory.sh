@@ -28,14 +28,14 @@ cat > expect <<EOF
 EOF
 
 cat > expect_errlog <<EOF
-Error: Multiple patch entries (2) have been found in patch <IO>
-Error: Multiple patch entries (2) have been found in patch <IO>
+ERROR: Multiple patch entries (2) have been found in patch <IO>
+ERROR: Multiple patch entries (2) have been found in patch <IO>
 EOF
 
 test_expect_success 'cannot patch single file with multi patch entries' '
 	touch ! -f actual &&
 	touch actual &&
-	test_must_fail rpatch actual < diff 2>actual_errlog &&
+	test_must_fail rpatch -vv actual < diff 2>actual_errlog &&
 	test_cmp expect actual &&
 	test_cmp expect_errlog actual_errlog
 '
@@ -60,7 +60,7 @@ EOF
 test_expect_success 'Patch to create newfiles' '
 	mkdir output &&
     test ! -d output/subdir/baz &&
-	rpatch output < diff 2>actual_errlog &&
+	rpatch -vv output < diff 2>actual_errlog &&
 	test -f output/foo &&
 	test -f output/subdir/baz/bar &&
 	test_cmp expect_foo output/foo &&
@@ -71,9 +71,9 @@ test_expect_success 'Patch to create newfiles' '
 ############################################################
 
 cat > expect_errlog <<EOF
-output/foo: Hunk 1 (add two lines) is already patched.
+INFO: output/foo: Hunk 1 (add two lines) is already patched.
 output/foo: nothing changed
-output/subdir/baz/bar: Hunk 1 (add two lines) is already patched.
+INFO: output/subdir/baz/bar: Hunk 1 (add two lines) is already patched.
 output/subdir/baz/bar: nothing changed
 EOF
 
@@ -90,7 +90,7 @@ EOF
 test_expect_success 'Patch to create newfiles (2): already patched warning' '
 	test_cmp expect_foo output/foo &&
 	test_cmp expect_bar output/subdir/baz/bar &&
-	rpatch output < diff 2>actual_errlog &&
+	rpatch -vv output < diff 2>actual_errlog &&
 	test_cmp expect_foo output/foo &&
 	test_cmp expect_bar output/subdir/baz/bar &&
 	test_cmp expect_errlog actual_errlog
@@ -137,7 +137,7 @@ tail of bar ...
 EOF
 
 test_expect_success 'Patch exist files' '
-	rpatch output < diff 2>actual_errlog &&
+	rpatch -vv output < diff 2>actual_errlog &&
 	test -f output/foo &&
 	test -f output/subdir/baz/bar &&
 	test_cmp expect_foo output/foo &&
@@ -182,7 +182,7 @@ bar
 EOF
 
 test_expect_success 'Patch one file fail, another success' '
-	test_must_fail rpatch output < diff 2>actual_errlog &&
+	test_must_fail rpatch -vv output < diff 2>actual_errlog &&
 	test -f output/foo &&
 	test -f output/subdir/baz/bar &&
 	test_cmp expect_foo output/foo &&
@@ -220,7 +220,7 @@ tail of bar...
 EOF
 
 test_expect_success 'Patch to remove file' '
-	rpatch -p1 output < diff 2>actual_errlog &&
+	rpatch -vv -p1 output < diff 2>actual_errlog &&
 	test ! -f output/foo &&
 	test -f output/subdir/baz/bar &&
 	test_cmp expect_bar output/subdir/baz/bar &&
@@ -230,15 +230,15 @@ test_expect_success 'Patch to remove file' '
 ############################################################
 
 cat > expect_errlog <<EOF
-output/foo: Hunk 1 (remove all) is already patched.
+INFO: output/foo: Hunk 1 (remove all) is already patched.
 output/foo: nothing changed
-output/subdir/baz/bar: Hunk 1 (add tail) is already patched.
+INFO: output/subdir/baz/bar: Hunk 1 (add tail) is already patched.
 output/subdir/baz/bar: nothing changed
 EOF
 
 test_expect_success 'Patch to remove file (2)' '
 	test ! -f output/foo &&
-	rpatch -p1 output < diff 2>actual_errlog &&
+	rpatch -vv -p1 output < diff 2>actual_errlog &&
 	test ! -f output/foo &&
 	test -f output/subdir/baz/bar &&
 	test_cmp expect_bar output/subdir/baz/bar &&

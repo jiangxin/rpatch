@@ -197,14 +197,14 @@ diff -u a/foo b/foo
 --- a/foo       2013-11-04 16:01:56.000000000 +0800
 +++ b/foo       2013-11-04 16:01:59.000000000 +0800
 @@ remove all
-RE:-heading
-RE:-foo
-RE:-tail.*
+/-heading
+/-foo
+/-tail.*
 diff -u a/subdir/baz/bar b/subdir/baz/bar
 --- a/subdir/baz/bar       2013-11-04 16:01:56.000000000 +0800
 +++ b/subdir/baz/bar       2013-11-04 16:01:59.000000000 +0800
 @@ add tail
-RE: ^[bB][aA][rR]$
+/ ^[bB][aA][rR]$
 +tail of bar...
 EOF
 

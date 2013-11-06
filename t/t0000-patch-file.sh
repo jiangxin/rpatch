@@ -146,11 +146,11 @@ diff -u a/foo b/foo
 --- a/foo       2013-11-04 16:01:56.000000000 +0800
 +++ b/foo       2013-11-04 16:01:59.000000000 +0800
 @@ remove bAr
-RE: ^[\\s]+(foo|FOO)\$
-RE:-[bB][aA][rR]
+/ ^[\\s]+(foo|FOO)\$
+/-[bB][aA][rR]
 +bar
 @@ mixed
-RE: baz
+/ baz
 +end of text
 EOF
 

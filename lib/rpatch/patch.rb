@@ -7,7 +7,7 @@ require 'rpatch/entry'
 
 module Rpatch
 
-  REGEXP_VALID_HUNK_PREFIX = /^(@@| |-|\+|RE: |RE:-|<$|>$)/
+  REGEXP_VALID_HUNK_PREFIX = /^(@@| |-|\+|RE: |RE:-|\/ |\/-|<$|>$)/
 
   class Patch
     attr_reader :name, :level, :patch_entries

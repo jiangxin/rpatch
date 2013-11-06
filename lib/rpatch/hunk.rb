@@ -56,7 +56,7 @@ module Rpatch
       i = j = 0
       while i < @diffs.size
         case @diffs[i]
-        when /^( |RE: )/
+        when /^( |RE: |\/ )/
           while true
             match =  match_line lines.first, patterns[j]
             if not match
@@ -68,7 +68,7 @@ module Rpatch
               result << lines.shift
             end
           end
-        when /^(-|RE:-)/
+        when /^(-|RE:-|\/-)/
           while true
             match =  match_line lines.first, patterns[j]
             if not match
@@ -254,7 +254,9 @@ module Rpatch
           when /^( |-)/
             result << line[1..-1].strip.gsub(/\s+/, ' ')
           when /^(RE: |RE:-)/
-            result << Regexp.new(line[4..-1].strip)
+            raise PatchFormatError.new("Obsolete pattern, subsitude \"RE:\" with \"/\":\n=> #{line}")
+          when /^(\/ |\/-)/
+            result << Regexp.new(line[2..-1].strip)
           when /^\+/
             next
           when /^(<|>)$/
@@ -274,9 +276,11 @@ module Rpatch
           case line
           when /^( |\+)/
             result << line[1..-1].strip.gsub(/\s+/, ' ')
-          when /^(RE: )/
-            result << Regexp.new(line[4..-1].strip)
-          when /^(-|RE:-)/
+          when /^RE: /
+            raise PatchFormatError.new("Obsolete pattern, subsitude \"RE:\" with \"/\":\n=> #{line}")
+          when /^\/ /
+            result << Regexp.new(line[2..-1].strip)
+          when /^(-|RE:-|\/-)/
             next
           when /^(<|>)$/
             # ignore locaiton direction
@@ -296,7 +300,9 @@ module Rpatch
           when /^( |\+|-)/
             result << line[1..-1].strip.gsub(/\s+/, ' ')
           when /^(RE: |RE:-)/
-            result << Regexp.new(line[4..-1].strip)
+            raise PatchFormatError.new("Obsolete pattern, subsitude \"RE:\" with \"/\":\n=> #{line}")
+          when /^(\/ |\/-)/
+            result << Regexp.new(line[2..-1].strip)
           when /^(<|>)$/
             # ignore locaiton direction
           else

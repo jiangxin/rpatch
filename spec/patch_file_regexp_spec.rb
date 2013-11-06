@@ -5,23 +5,24 @@ require 'spec_helper'
 require 'stringio'
 
 describe Rpatch::Patch do
-    let(:diff) do
-      <<-EOF
+
+  it "regexp patterns test" do
+    diff = <<-EOF
 diff -ru before/readme.txt after/readme.txt
 --- a/readme.txt   2013-11-03 22:17:02.000000000 +0800
 +++ b/readme.txt    2013-11-03 21:10:46.000000000 +0800
 @@ remove two leading lines
 -I have a script to patch text files, it's more like
-RE:-.* Why not (patch|GNU patch)?
+/-.* Why not (patch|GNU patch)?
  When I hack files using GNU patch,
-RE: sometimes fail because .*
+/ sometimes fail because .*
 @@ add copyright
 +/*
 + * Copyright (c) 2013 Jiang Xin
 + */
 +
  When I hack files using GNU patch,
-RE: sometimes fail because .*
+/ sometimes fail because .*
 @@ add notes
 +If patch can ignore blank lines, support regex patterns
 +in patch, it will be nice.
@@ -32,9 +33,7 @@ RE: sometimes fail because .*
 +--
 +jiangxin
     EOF
-  end
 
-  it "patch on file" do
     before = <<-EOF
 I have a script to patch text files, it's more like
 "grep" and "seed -s". Why not GNU patch?
@@ -69,5 +68,4 @@ jiangxin
     patch.apply_to(inputfile, outputfile)
     output.should == after
   end
-
 end
